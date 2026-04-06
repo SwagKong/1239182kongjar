@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SwagKong JARVIS HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0a; --bg2:#111111; --bg3:#181818; --bg4:#202020;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --text:#f0ede8; --muted:#888; --dim:#555;
+  --gold:#c9a84c; --gold2:#f0c96b; --gold-glow:rgba(201,168,76,0.12);
+  --green:#3ecf8e; --red:#f87171; --blue:#60a5fa; --orange:#fb923c;
+  --mono:'JetBrains Mono',monospace; --display:'Bebas Neue',sans-serif; --body:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--body);height:100%;}
+
+/* BOOT */
+#boot{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s;}
+#boot.hide{opacity:0;pointer-events:none;}
+.bkong{width:80px;height:80px;border-radius:50%;background:var(--gold);border:2px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:38px;animation:kpulse 1.5s ease-in-out infinite;}
+@keyframes kpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+.btitle{font-family:var(--display);font-size:52px;letter-spacing:5px;color:var(--gold2);}
+.bsub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:3px;}
+.bbar-w{width:260px;height:2px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.bbar{height:100%;background:var(--gold);width:0%;transition:width .4s ease;border-radius:2px;}
+.bstatus{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:1px;min-height:16px;text-align:center;}
+
+/* APP */
+.app{display:none;flex-direction:column;height:100vh;}
+.app.on{display:flex;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.brand-name{font-family:var(--display);font-size:24px;letter-spacing:2px;color:var(--gold2);line-height:1;}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.hdr-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.clock-box{font-family:var(--mono);font-size:13px;color:var(--gold);background:var(--gold-glow);padding:5px 10px;border-radius:6px;border:1px solid rgba(201,168,76,0.2);}
+.stream-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.sb-live{background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.25);}
+.sb-soon{background:rgba(251,146,60,0.12);color:var(--orange);border:1px solid rgba(251,146,60,0.25);}
+.sb-off{background:rgba(136,136,136,0.1);color:var(--muted);border:1px solid var(--border);}
+.pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 1.2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.api-badge{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;cursor:pointer;letter-spacing:.5px;white-space:nowrap;}
+.api-ok{background:rgba(62,207,142,0.1);color:var(--green);border:1px solid rgba(62,207,142,0.25);}
+.api-no{background:rgba(248,113,113,0.08);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+
+/* NAV */
+.nav{display:flex;gap:2px;padding:8px 20px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;}
+.nav::-webkit-scrollbar{display:none;}
+.nbtn{flex-shrink:0;padding:7px 14px;border-radius:6px;font-size:12px;font-family:var(--body);font-weight:500;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.nbtn:hover{color:var(--text);background:var(--bg3);}
+.nbtn.on{background:var(--gold-glow);color:var(--gold2);border-color:rgba(201,168,76,0.2);}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;}
+.tab{display:none;width:100%;height:100%;overflow-y:auto;padding:18px 20px;flex-direction:column;}
+.tab.on{display:flex;}
+.tab::-webkit-scrollbar{width:4px;}
+.tab::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+.max-w{max-width:900px;width:100%;margin:0 auto;}
+
+/* SECTION LABEL */
+.slbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin:1.2rem 0 .7rem;display:flex;align-items:center;gap:8px;}
+.slbl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;flex-shrink:0;}
+.card-hd{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.card-btn{font-size:10px;color:var(--gold);background:var(--gold-glow);border:1px solid rgba(201,168,76,0.2);padding:3px 10px;border-radius:20px;cursor:pointer;font-family:var(--mono);letter-spacing:.5px;transition:background .15s;}
+.card-btn:hover{background:rgba(201,168,76,0.25);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+
+/* INSTRUMENT CARDS */
+.inst-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden;}
+.inst-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.gbpjpy-c::before{background:var(--blue);}
+.gold-c::before{background:var(--gold);}
+.ger40-c::before{background:var(--orange);}
+.inst-card:hover{border-color:var(--border2);}
+.inst-name{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase;}
+.inst-price{font-family:var(--mono);font-size:22px;font-weight:500;line-height:1;margin-bottom:3px;}
+.inst-chg{font-family:var(--mono);font-size:12px;}
+.inst-chg.up{color:var(--green);}
+.inst-chg.dn{color:var(--red);}
+.inst-spread{font-size:10px;color:var(--dim);margin-top:4px;}
+.inst-sess{font-size:10px;margin-top:6px;padding:2px 7px;border-radius:4px;display:inline-block;font-weight:600;}
+.sess-on{background:rgba(62,207,142,0.1);color:var(--green);}
+.sess-off{background:rgba(136,136,136,0.1);color:var(--dim);}
+
+/* STAT CARDS */
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--gold2);}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ALERT BOXES */
+.alert{padding:12px 14px;border-radius:8px;margin-bottom:8px;border-left:3px solid;font-size:13px;line-height:1.6;}
+.alert b{font-weight:600;}
+.al-gold{background:rgba(201,168,76,0.08);border-color:var(--gold);color:#f0c96b;}
+.al-green{background:rgba(62,207,142,0.08);border-color:var(--green);color:#6effc3;}
+.al-red{background:rgba(248,113,113,0.08);border-color:var(--red);color:#fca5a5;}
+.al-blue{background:rgba(96,165,250,0.08);border-color:var(--blue);color:#93c5fd;}
+.al-orange{background:rgba(251,146,60,0.08);border-color:var(--orange);color:#fdba74;}
+
+/* SCHEDULE */
+.sched-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);}
+.sched-item:last-child{border-bottom:none;}
+.sched-time{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:60px;padding-top:2px;}
+.sched-dot{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:5px;}
+.sched-circle{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sched-line{flex:1;width:1px;background:var(--border);min-height:16px;}
+.sched-content{flex:1;}
+.sched-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.sched-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.sbadge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px;vertical-align:middle;}
+
+/* CHECKLIST */
+.check-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer;}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;}
+.check-box.done{background:var(--green);border-color:var(--green);}
+.check-box.done::after{content:'✓';font-size:11px;color:#000;font-weight:700;}
+.check-title{font-size:13px;font-weight:500;}
+.check-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.check-item.is-done .check-title{text-decoration:line-through;color:var(--dim);}
+
+/* SESSION GRID */
+.sess-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.sess-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.sess-mkt{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500;letter-spacing:.3px;}
+.sess-time-big{font-family:var(--mono);font-size:20px;font-weight:500;margin-bottom:4px;}
+.sess-status{font-size:12px;font-weight:600;}
+.sess-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+
+/* INSTRUMENT DETAIL */
+.inst-detail{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;}
+.inst-detail-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.inst-detail-name{font-family:var(--display);font-size:28px;letter-spacing:2px;}
+.inst-detail-price{font-family:var(--mono);font-size:26px;font-weight:500;text-align:right;}
+.sess-times-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.stc{background:var(--bg4);border-radius:7px;padding:10px;text-align:center;}
+.stc-lbl{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.stc-val{font-family:var(--mono);font-size:14px;font-weight:500;}
+.stc.active{border:1px solid var(--green);}
+.stc.active .stc-val{color:var(--green);}
+.strat-tips{margin-top:12px;}
+.stip{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;}
+.stip:last-child{border-bottom:none;}
+.stip::before{content:'→';color:var(--gold);flex-shrink:0;}
+
+/* ANALYSIS */
+.a-pair{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.a-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.a-pname{font-family:var(--display);font-size:22px;letter-spacing:1px;}
+.a-body{font-size:12px;color:var(--muted);line-height:1.75;}
+.a-lvls{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.lvl{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;}
+.lvl-r{color:var(--red);border:1px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.08);}
+.lvl-s{color:var(--green);border:1px solid rgba(62,207,142,0.25);background:rgba(62,207,142,0.08);}
+.lvl-tp{color:var(--gold);border:1px solid rgba(201,168,76,0.25);background:var(--gold-glow);}
+.lvl-sl{color:var(--red);border:1px solid rgba(248,113,113,0.25);background:rgba(248,113,113,0.08);}
+.bias-pill{font-size:10px;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-weight:700;letter-spacing:1px;}
+.b-bull{background:rgba(62,207,142,0.1);color:var(--green);border:1px solid rgba(62,207,142,0.25);}
+.b-bear{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.b-neu{background:var(--bg4);color:var(--muted);border:1px solid var(--border);}
+
+/* CONTENT IDEAS */
+.idea-item{padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
+.idea-item:last-child{border-bottom:none;}
+.idea-num{width:26px;height:26px;border-radius:6px;background:var(--gold-glow);border:1px solid rgba(201,168,76,0.2);color:var(--gold);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.idea-title{font-size:13px;font-weight:500;margin-bottom:3px;}
+.idea-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:4px 4px 0 0;}
+.tg{background:var(--gold-glow);color:var(--gold);}
+.tb{background:rgba(96,165,250,0.1);color:var(--blue);}
+.tr{background:rgba(248,113,113,0.1);color:var(--red);}
+.tgr{background:rgba(62,207,142,0.1);color:var(--green);}
+.to{background:rgba(251,146,60,0.1);color:var(--orange);}
+
+/* WEEK CALENDAR */
+.week-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.week-row:last-child{border-bottom:none;}
+.week-day{font-size:12px;font-weight:600;min-width:80px;padding-top:2px;}
+.week-tasks{flex:1;display:flex;flex-direction:column;gap:3px;}
+.week-task{font-size:12px;color:var(--muted);display:flex;gap:6px;}
+.week-task::before{content:'›';color:var(--dim);}
+
+/* GOALS */
+.goal-item{margin-bottom:16px;}
+.goal-hd{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;}
+.goal-name{font-weight:500;}
+.goal-target{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.bar-bg{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;background:var(--gold);transition:width .5s;}
+
+/* HABITS */
+.habit-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.habit-item:last-child{border-bottom:none;}
+.habit-lbl{flex:1;font-size:13px;font-weight:500;}
+.habit-dots{display:flex;gap:5px;}
+.habit-dot{width:20px;height:20px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .1s;}
+.habit-dot.filled{background:var(--gold);border-color:var(--gold);}
+.habit-val{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:32px;text-align:right;}
+
+/* CONTENT GENERATOR */
+.ct{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.ct-plat{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.ct-pre{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.ct-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.ct-tag{font-family:var(--mono);font-size:9px;color:var(--muted);background:var(--bg4);padding:2px 8px;border-radius:20px;}
+.ct-copy{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--gold);background:var(--gold-glow);border:1px solid rgba(201,168,76,0.25);padding:5px 12px;border-radius:6px;cursor:pointer;letter-spacing:.5px;transition:background .15s;}
+.ct-copy:hover{background:rgba(201,168,76,0.25);}
+
+/* JARVIS CHAT */
+.jcont{display:flex;flex-direction:column;height:100%;}
+.jmsgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.jmsgs::-webkit-scrollbar{width:4px;}
+.jmsgs::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+.msg{display:flex;gap:10px;max-width:88%;}
+.msg.me{align-self:flex-end;flex-direction:row-reverse;}
+.mav{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.mav.j{background:var(--gold);}
+.mav.u{background:var(--bg4);}
+.mbub{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.65;color:var(--text);}
+.msg.me .mbub{background:var(--gold-glow);border-color:rgba(201,168,76,0.2);}
+.mbub b{color:var(--gold2);font-weight:600;}
+.bot-name{font-size:10px;color:var(--gold);font-weight:600;letter-spacing:.5px;margin-bottom:4px;}
+.jbar{background:var(--bg2);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.jinput{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--body);font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
+.jinput:focus{border-color:rgba(201,168,76,0.4);}
+.jinput::placeholder{color:var(--dim);}
+.jsend{background:var(--gold);color:var(--bg);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.jsend:hover{background:var(--gold2);}
+.qbtns{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px 0;flex-shrink:0;}
+.qbtn{font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);padding:5px 10px;border-radius:20px;cursor:pointer;transition:all .15s;}
+.qbtn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* SETUP */
+.setup-card{background:var(--bg3);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;max-width:480px;width:100%;}
+.setup-card h3{font-family:var(--display);font-size:26px;color:var(--gold2);letter-spacing:2px;margin-bottom:8px;}
+.setup-card p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.step-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.step-list li{font-size:12px;color:var(--muted);line-height:1.6;display:flex;gap:8px;align-items:flex-start;}
+.sn{font-family:var(--mono);font-size:10px;background:var(--gold-glow);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:1px 7px;flex-shrink:0;margin-top:2px;}
+.sinp{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s;}
+.sinp:focus{border-color:var(--gold);}
+.sbtn{width:100%;background:var(--gold);color:var(--bg);border:none;border-radius:8px;padding:12px;font-family:var(--display);font-size:18px;letter-spacing:2px;cursor:pointer;transition:background .15s;}
+.sbtn:hover{background:var(--gold2);}
+.snote{font-size:11px;color:var(--dim);line-height:1.6;margin-top:12px;}
+.snote a{color:var(--gold);}
+
+/* TYPING */
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0;}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:ty .8s ease-in-out infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes ty{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-5px);}}
+
+/* GEN */
+.gen{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:1px;display:flex;align-items:center;gap:8px;padding:10px 0;}
+.spin{width:12px;height:12px;border:2px solid rgba(201,168,76,0.25);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@keyframes fu{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.fu{animation:fu .3s ease forwards;}
+
+/* ECON EVENTS */
+.econ-ev{padding:10px 0;border-bottom:1px solid var(--border);}
+.econ-ev:last-child{border-bottom:none;}
+.econ-hd{display:flex;justify-content:space-between;margin-bottom:3px;}
+.econ-name{font-size:13px;font-weight:500;}
+.econ-time{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.econ-note{font-size:12px;color:var(--muted);margin-bottom:5px;line-height:1.5;}
+.econ-meta{display:flex;gap:5px;align-items:center;}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .g2,.g3{grid-template-columns:1fr;}
+  .sess-grid{grid-template-columns:1fr;}
+  .sess-times-grid{grid-template-columns:repeat(2,1fr);}
+  .header{padding:10px 14px;flex-wrap:wrap;gap:8px;}
+  .tab{padding:14px;}
+  .nav{padding:8px 14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT -->
+<div id="boot">
+  <div class="bkong">🦍</div>
+  <div class="btitle">SWAGKONG</div>
+  <div class="bsub">JARVIS HQ · TRADING COMMAND CENTER</div>
+  <div class="bbar-w"><div class="bbar" id="bbar"></div></div>
+  <div class="bstatus" id="bstat">Initializing...</div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">🦍</div>
+      <div>
+        <div class="brand-name">SWAGKONG</div>
+        <div class="brand-sub">JARVIS HQ · WIB</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span id="api-badge" class="api-badge api-no" onclick="goTab('setup')">API: Not Set</span>
+      <div class="clock-box" id="clock">--:--:--</div>
+      <div class="stream-badge sb-off" id="stream-badge"><span class="pulse"></span><span id="stream-txt">OFF AIR</span></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nbtn on" onclick="goTab('dashboard')">📊 Dashboard</button>
+    <button class="nbtn" onclick="goTab('markets')">📈 Markets &amp; Pairs</button>
+    <button class="nbtn" onclick="goTab('analysis')">🔍 H4 Analysis</button>
+    <button class="nbtn" onclick="goTab('stream')">🎙 Stream Prep</button>
+    <button class="nbtn" onclick="goTab('content')">🎬 Content</button>
+    <button class="nbtn" onclick="goTab('goals')">🏆 Goals</button>
+    <button class="nbtn" onclick="goTab('jarvis')">🦍 JARVIS AI</button>
+    <button class="nbtn" onclick="goTab('setup')">⚙ Setup</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="tab on" id="tab-dashboard">
+      <div class="max-w">
+        <div class="g3" style="margin-bottom:12px;">
+          <div class="stat-card"><div class="stat-val" id="dash-time">--:--</div><div class="stat-lbl">WIB Now</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-cd">--</div><div class="stat-lbl">Stream Window</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-sess" style="font-size:16px;">--</div><div class="stat-lbl">Market Session</div></div>
+        </div>
+
+        <div class="g3" id="inst-cards" style="margin-bottom:12px;"></div>
+
+        <div class="slbl">Today's Schedule</div>
+        <div class="card"><div id="today-sched"></div></div>
+
+        <div class="slbl">Daily Checklist</div>
+        <div class="card"><div id="dash-checks"></div></div>
+
+        <div class="slbl">🦍 Morning Brief</div>
+        <div class="card">
+          <div class="card-hd">AI Market Brief <span class="card-btn" onclick="genBrief()">Generate</span></div>
+          <div id="brief-out" style="font-size:13px;color:var(--muted);line-height:1.7;">Hit Generate for today's AI-powered brief...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MARKETS & PAIRS (COMBINED) ══ -->
+    <div class="tab" id="tab-markets">
+      <div class="max-w">
+        <div class="slbl">Live Market Clocks</div>
+        <div class="sess-grid" id="mkt-clocks"></div>
+
+        <div class="slbl">Best Stream Windows (WIB)</div>
+        <div class="card">
+          <div class="alert al-gold"><b>🔥 Prime Time: 9:30 PM – 11:00 PM WIB</b><br>NYSE opens — highest volatility for Gold, GBPJPY, and GER40. This is showtime.</div>
+          <div class="alert al-green"><b>✅ Warm-Up: 9:00 PM – 9:30 PM WIB</b><br>Go live 30 min early. Build chat energy, review key levels, announce your bias.</div>
+          <div class="alert al-blue"><b>📊 Prep Window: 6:00 PM – 8:00 PM WIB</b><br>London session live. Gold and GBPJPY active. Good for research and clip editing.</div>
+          <div class="alert al-red"><b>⚡ Event Alerts: 8:30 PM WIB</b><br>US CPI, NFP, and FOMC data drop here. Go live early on these days — massive content opportunity.</div>
+        </div>
+
+        <div class="slbl">Your 3 Pairs — Session Guide</div>
+        <div class="inst-detail">
+          <div class="inst-detail-hd">
+            <div><div class="inst-detail-name" style="color:var(--blue)">GBPJPY</div><div style="font-size:12px;color:var(--muted);margin-top:3px">British Pound / Japanese Yen</div></div>
+            <div><div class="inst-detail-price" id="dp-gbpjpy" style="color:var(--blue)">---.--</div><div id="dc-gbpjpy" style="text-align:right;font-family:var(--mono);font-size:13px;margin-top:2px;">--</div></div>
+          </div>
+          <div class="sess-times-grid">
+            <div class="stc" id="gbpjpy-london"><div class="stc-lbl">London Open</div><div class="stc-val">2:00 PM WIB</div></div>
+            <div class="stc" id="gbpjpy-overlap"><div class="stc-lbl">London/NY Overlap</div><div class="stc-val">8:30 PM WIB</div></div>
+            <div class="stc" id="gbpjpy-ny"><div class="stc-lbl">NY Open</div><div class="stc-val">9:30 PM WIB</div></div>
+          </div>
+          <div class="strat-tips" style="margin-top:10px;">
+            <div class="stip">Most volatile 8:30–10:30 PM WIB (London/NY overlap) — 80–150 pip moves common</div>
+            <div class="stip">Watch BOE and BOJ announcements — GBPJPY reacts massively to both central banks</div>
+            <div class="stip">Avoid 5:00–7:00 AM WIB (Tokyo-only) — slow and choppy, bad for streaming</div>
+          </div>
+        </div>
+
+        <div class="inst-detail">
+          <div class="inst-detail-hd">
+            <div><div class="inst-detail-name" style="color:var(--gold)">XAU / USD</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Spot Gold · XAUUSD</div></div>
+            <div><div class="inst-detail-price" id="dp-gold" style="color:var(--gold2)">----.-</div><div id="dc-gold" style="text-align:right;font-family:var(--mono);font-size:13px;margin-top:2px;">--</div></div>
+          </div>
+          <div class="sess-times-grid">
+            <div class="stc" id="gold-london"><div class="stc-lbl">London Open</div><div class="stc-val">2:00 PM WIB</div></div>
+            <div class="stc" id="gold-ny"><div class="stc-lbl">NY Open</div><div class="stc-val">9:30 PM WIB</div></div>
+            <div class="stc" id="gold-nfp"><div class="stc-lbl">NFP / CPI Data</div><div class="stc-val">8:30 PM WIB</div></div>
+          </div>
+          <div class="strat-tips" style="margin-top:10px;">
+            <div class="stip">Gold is at ALL-TIME HIGHS near $4,650+ in April 2026 — driven by geopolitical risk and central bank buying</div>
+            <div class="stip">Watch DXY — when Dollar weakens, Gold pumps. When Dollar strengthens, Gold dips</div>
+            <div class="stip">Key round numbers ($4,500 / $4,600 / $4,700 / $4,800) act as strong S/R — these are your levels</div>
+          </div>
+        </div>
+
+        <div class="inst-detail">
+          <div class="inst-detail-hd">
+            <div><div class="inst-detail-name" style="color:var(--orange)">GER40</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Germany 40 Index · DAX</div></div>
+            <div><div class="inst-detail-price" id="dp-ger40" style="color:var(--orange)">-----</div><div id="dc-ger40" style="text-align:right;font-family:var(--mono);font-size:13px;margin-top:2px;">--</div></div>
+          </div>
+          <div class="sess-times-grid">
+            <div class="stc" id="ger40-xetra"><div class="stc-lbl">Xetra Open</div><div class="stc-val">2:00 PM WIB</div></div>
+            <div class="stc" id="ger40-cash"><div class="stc-lbl">Cash Session</div><div class="stc-val">2–10:30 PM WIB</div></div>
+            <div class="stc" id="ger40-us"><div class="stc-lbl">US Influence</div><div class="stc-val">9:30 PM WIB</div></div>
+          </div>
+          <div class="strat-tips" style="margin-top:10px;">
+            <div class="stip">GER40 is in correction mode Apr 2026 — ranging 22,000–23,300 after ATH at 25,507 in Jan 2026</div>
+            <div class="stip">Heavily influenced by US market open — GER40 makes its biggest move at 9:30 PM WIB</div>
+            <div class="stip">Middle East tensions and Iran situation directly moving this index week of April 6, 2026</div>
+          </div>
+        </div>
+
+        <div class="slbl">Key Economic Events for Your Pairs</div>
+        <div class="card"><div id="econ-events"></div></div>
+      </div>
+    </div>
+
+    <!-- ══ H4 ANALYSIS ══ -->
+    <div class="tab" id="tab-analysis">
+      <div class="max-w">
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--muted);line-height:1.7;">
+          <b style="color:var(--gold2);">🔍 H4 Deep Research — April 6, 2026</b><br>
+          Levels researched from live market data. The SVG charts below are visual representations of H4 structure — not live feeds. Use TradingView to confirm entries. Green zones = support. Red zones = resistance. Orange line = current price area.
+        </div>
+        <div id="analysis-out"></div>
+      </div>
+    </div>
+
+    <!-- ══ STREAM PREP ══ -->
+    <div class="tab" id="tab-stream">
+      <div class="max-w">
+        <div class="slbl">Pre-Stream Checklist (Start 8:30 PM)</div>
+        <div class="card"><div id="stream-checks"></div></div>
+
+        <div class="slbl">Stream Structure — 90 Minutes</div>
+        <div class="card"><div id="stream-structure"></div></div>
+
+        <div class="slbl">Talking Points — Your 3 Pairs</div>
+        <div class="card">
+          <div class="alert al-blue"><b>GBPJPY:</b> "What's the Bank of England doing? Sterling strength vs JPY weakness — here's my key level for tonight..."</div>
+          <div class="alert al-gold"><b>GOLD (XAU/USD):</b> "Dollar up or down today? Risk on or off? Here's where Gold wants to go and why..."</div>
+          <div class="alert al-orange"><b>GER40:</b> "How's the European economy doing? Here's what the DAX is telling us about tonight's US open..."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONTENT ══ -->
+    <div class="tab" id="tab-content">
+      <div class="max-w">
+        <div class="card">
+          <div class="card-hd">Content Pack Generator <span class="card-btn" onclick="genContent()">↻ Generate Fresh</span></div>
+          <div id="content-gen-out"><div class="gen"><div class="spin"></div>Loading content pack...</div></div>
+        </div>
+
+        <div class="slbl">Weekly Content Calendar</div>
+        <div class="card"><div id="weekly-cal"></div></div>
+
+        <div class="slbl">SwagKong Content Ideas</div>
+        <div class="card"><div id="content-ideas"></div></div>
+      </div>
+    </div>
+
+    <!-- ══ GOALS ══ -->
+    <div class="tab" id="tab-goals">
+      <div class="max-w">
+        <div class="slbl">6-Month Income Milestones</div>
+        <div class="card"><div id="goals-list"></div></div>
+
+        <div class="slbl">Weekly Habit Tracker</div>
+        <div class="card">
+          <div id="habit-tracker"></div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+            <button onclick="resetHabits()" style="font-size:12px;color:var(--dim);background:none;border:none;cursor:pointer;font-family:var(--body);">Reset week →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ JARVIS AI ══ -->
+    <div class="tab" id="tab-jarvis" style="padding:0;">
+      <div class="jcont">
+        <div class="jmsgs" id="jmsgs">
+          <div class="msg fu">
+            <div class="mav j">🦍</div>
+            <div class="mbub">
+              <div class="bot-name">JARVIS</div>
+              Yo Kong. JARVIS online and locked into your 3 pairs — <b>GBPJPY · XAU/USD · GER40</b>.<br><br>
+              Your prime stream window is <b>9:00–11:00 PM WIB</b> — that's when all 3 pairs are moving hard.<br><br>
+              Go to <b>⚙ Setup</b> to paste your Anthropic API key and fully activate me. Then ask me anything — market analysis, content ideas, what to post, trade setups. 🦍
+            </div>
+          </div>
+        </div>
+        <div class="qbtns">
+          <div class="qbtn" onclick="qask('Full GBPJPY analysis right now')">GBPJPY analysis</div>
+          <div class="qbtn" onclick="qask('Full XAU/USD analysis right now')">Gold analysis</div>
+          <div class="qbtn" onclick="qask('Full GER40 analysis right now')">GER40 analysis</div>
+          <div class="qbtn" onclick="qask('What should I post on X today about my pairs?')">X post idea</div>
+          <div class="qbtn" onclick="qask('Write a 60-second YouTube Shorts script for today, pick the most interesting pair')">YT Short script</div>
+          <div class="qbtn" onclick="qask('Give me my full morning brief for today covering GBPJPY, Gold, and GER40')">Morning brief</div>
+          <div class="qbtn" onclick="qask('Write a TikTok caption for my live stream tonight at 9 PM WIB')">TikTok caption</div>
+          <div class="qbtn" onclick="qask('Any high impact news today that affects GBPJPY, Gold, or GER40?')">News check</div>
+        </div>
+        <div class="jbar">
+          <input class="jinput" id="jinput" placeholder="Ask JARVIS anything about your pairs, content, or strategy..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+          <button class="jsend" onclick="sendMsg()">Send ↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETUP ══ -->
+    <div class="tab" id="tab-setup" style="align-items:center;justify-content:center;">
+      <div class="setup-card">
+        <h3>Setup JARVIS AI</h3>
+        <p>Add your Anthropic API key to unlock full JARVIS AI — live analysis for GBPJPY, Gold, and GER40, content generation, trade setups, and your morning brief.</p>
+        <ol class="step-list">
+          <li><span class="sn">1</span>Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> — free sign up</li>
+          <li><span class="sn">2</span>Click API Keys → Create New Key → Copy it</li>
+          <li><span class="sn">3</span>Paste below and hit Save — done</li>
+          <li><span class="sn">4</span>New accounts get free credits — enough for weeks of daily use</li>
+        </ol>
+        <input class="sinp" id="key-inp" type="password" placeholder="sk-ant-api03-..."/>
+        <button class="sbtn" onclick="saveKey()">SAVE AND ACTIVATE JARVIS</button>
+        <div class="snote">Key stored only in your browser (localStorage). Sent only to Anthropic API when you message JARVIS. Cost: ~$0.003 per message.</div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════
+// WIB CLOCK — hardcoded UTC+7
+// ══════════════════════════════════════════
+function getWIB() {
+  var now = new Date();
+  return new Date(now.getTime() + now.getTimezoneOffset()*60000 + 7*3600000);
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function updateClock() {
+  var w = getWIB();
+  var h=w.getHours(), m=w.getMinutes(), s=w.getSeconds();
+  var t = h*60+m;
+  document.getElementById('clock').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+  document.getElementById('dash-time').textContent = pad(h)+':'+pad(m);
+
+  // Stream status (prime: 21:30–23:00 WIB)
+  var sb = document.getElementById('stream-badge');
+  var st = document.getElementById('stream-txt');
+  var cd = document.getElementById('dash-cd');
+  if(t >= 21*60+30 && t < 23*60) {
+    sb.className='stream-badge sb-live'; st.textContent='LIVE NOW';
+    cd.textContent=(23*60-t)+'m left';
+  } else if(t >= 21*60 && t < 21*60+30) {
+    sb.className='stream-badge sb-soon'; st.textContent='WARMUP';
+    cd.textContent='Warmup now';
+  } else if(t >= 20*60 && t < 21*60) {
+    sb.className='stream-badge sb-soon'; st.textContent='STREAM SOON';
+    var mins=(21*60)-t; cd.textContent='In '+mins+'m';
+  } else {
+    sb.className='stream-badge sb-off'; st.textContent='OFF AIR';
+    var mins=(21*60+30)-t; if(mins<0) mins+=24*60;
+    var hh=Math.floor(mins/60), mm=mins%60;
+    cd.textContent=hh>0?hh+'h '+mm+'m':mm+'m';
+  }
+
+  // Session
+  var isLondon=t>=14*60&&t<22*60+30, isNY=t>=21*60+30&&t<23*60, isTokyo=t>=7*60&&t<14*60;
+  var sess='Pre-market';
+  if(isNY) sess='🇺🇸 NY Open';
+  else if(isLondon) sess='🇬🇧 London';
+  else if(isTokyo) sess='🇯🇵 Tokyo';
+  document.getElementById('dash-sess').textContent=sess;
+
+  // Highlight active session cards
+  var inLon=t>=14*60&&t<22*60+30, inNY=t>=21*60+30&&t<23*60;
+  function setActive(id,on){ var el=document.getElementById(id); if(el){el.className=on?'stc active':'stc';} }
+  setActive('gbpjpy-london', inLon && !inNY);
+  setActive('gbpjpy-overlap', inNY);
+  setActive('gbpjpy-ny', inNY);
+  setActive('gold-london', inLon && !inNY);
+  setActive('gold-ny', inNY);
+  setActive('ger40-xetra', inLon);
+  setActive('ger40-us', inNY);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+var bootLines = [
+  'Loading GBPJPY feed...','Connecting Gold stream...','Syncing GER40 data...',
+  'Calibrating JARVIS AI...','SwagKong HQ online. 🦍'
+];
+var bi=0;
+function bootTick() {
+  if(bi>=bootLines.length) {
+    setTimeout(function(){
+      document.getElementById('boot').classList.add('hide');
+      setTimeout(function(){
+        document.getElementById('boot').style.display='none';
+        document.getElementById('app').classList.add('on');
+        initApp();
+      },500);
+    },300);
+    return;
+  }
+  document.getElementById('bstat').textContent=bootLines[bi];
+  document.getElementById('bbar').style.width=((bi+1)/bootLines.length*100)+'%';
+  bi++;
+  setTimeout(bootTick,550);
+}
+setTimeout(bootTick,400);
+
+function initApp() {
+  renderInstCards();
+  renderTodaySched();
+  buildChecklist(dailyChecks,'dash-checks','sk-daily');
+  buildChecklist(streamChecks,'stream-checks','sk-stream');
+  buildStructure();
+  updateMarketClocks();
+  buildEconEvents();
+  buildWeekly();
+  buildIdeas();
+  buildGoals();
+  buildHabits();
+  renderAnalysis(false);
+  genContent();
+  checkKey();
+}
+
+// ══════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════
+function getKey(){ return localStorage.getItem('sk_kong')||''; }
+function saveKey() {
+  var k=document.getElementById('key-inp').value.trim();
+  if(!k.startsWith('sk-ant')){alert('Key should start with sk-ant...');return;}
+  localStorage.setItem('sk_kong',k);
+  checkKey();
+  goTab('jarvis');
+  addMsg('j','API key saved and JARVIS fully activated. 🦍<br><br>I know your 3 pairs — <b>GBPJPY, XAU/USD, and GER40</b>. Your prime stream window is <b>9:00–11:00 PM WIB</b>. Ask me anything.');
+}
+function checkKey() {
+  var k=getKey(), el=document.getElementById('api-badge');
+  if(k){el.textContent='JARVIS: Active';el.className='api-badge api-ok';document.getElementById('key-inp').value=k;}
+  else{el.textContent='API: Not Set';el.className='api-badge api-no';}
+}
+function goSetup(){ goTab('setup'); }
+
+// ══════════════════════════════════════════
+// PRICES
+// ══════════════════════════════════════════
+var prices={
+  gbpjpy:{base:191.45,change:0.32,pct:0.17,spread:2.1,dp:2,color:'var(--blue)',cls:'gbpjpy-c',label:'GBPJPY'},
+  gold:  {base:2338.50,change:-4.20,pct:-0.18,spread:0.35,dp:2,color:'var(--gold2)',cls:'gold-c',label:'XAU/USD'},
+  ger40: {base:18724,change:87,pct:0.47,spread:1.2,dp:0,color:'var(--orange)',cls:'ger40-c',label:'GER40'},
+};
+
+function jitter(v,r){return v+(Math.random()-.5)*r;}
+
+function renderInstCards() {
+  var w=getWIB(),h=w.getHours(),m=w.getMinutes(),t=h*60+m;
+  var inSess=t>=14*60&&t<23*60;
+  var el=document.getElementById('inst-cards');
+  el.innerHTML='';
+  var keys=['gbpjpy','gold','ger40'];
+  keys.forEach(function(k){
+    var p=prices[k];
+    var live=jitter(p.base,k==='ger40'?3:k==='gold'?1.5:0.05);
+    var up=p.change>=0;
+    var priceStr=k==='ger40'?Math.round(live).toLocaleString():live.toFixed(p.dp);
+    el.innerHTML+='<div class="inst-card '+p.cls+'">'+
+      '<div class="inst-name">'+p.label+'</div>'+
+      '<div class="inst-price" style="color:'+p.color+'">'+priceStr+'</div>'+
+      '<div class="inst-chg '+(up?'up':'dn')+'">'+(up?'+':'')+p.change.toFixed(p.dp)+' ('+(up?'+':'')+p.pct.toFixed(2)+'%)</div>'+
+      '<div class="inst-spread">Spread: ~'+p.spread+(k==='ger40'?' pts':' pips')+'</div>'+
+      '<div class="inst-sess '+(inSess?'sess-on':'sess-off')+'">'+(inSess?'● Active':'○ Quiet')+'</div>'+
+      '</div>';
+    // update detail prices
+    var dp=document.getElementById('dp-'+k), dc=document.getElementById('dc-'+k);
+    if(dp){dp.textContent=priceStr;}
+    if(dc){dc.textContent=(up?'+':'')+p.change.toFixed(p.dp)+' ('+(up?'+':'')+p.pct.toFixed(2)+'%)';dc.style.color=up?'var(--green)':'var(--red)';}
+  });
+}
+setInterval(function(){
+  Object.keys(prices).forEach(function(k){
+    prices[k].base*=(1+(Math.random()-.49)*0.0007);
+    prices[k].change+=(Math.random()-.5)*0.03;
+    prices[k].pct=prices[k].change/prices[k].base*100;
+  });
+  renderInstCards();
+},5000);
+
+// ══════════════════════════════════════════
+// MARKET CLOCKS
+// ══════════════════════════════════════════
+var markets=[
+  {name:'NYSE / NASDAQ',tz:'America/New_York',open:570,close:960,label:'Gold + GBPJPY prime'},
+  {name:'Frankfurt (GER40)',tz:'Europe/Berlin',open:540,close:1350,label:'DAX Index'},
+  {name:'London (GBPJPY)',tz:'Europe/London',open:480,close:1110,label:'Forex + Indices'},
+  {name:'Jakarta (WIB)',tz:'Asia/Jakarta',open:540,close:930,label:'Your base'},
+];
+function updateMarketClocks() {
+  var el=document.getElementById('mkt-clocks');
+  if(!el) return;
+  el.innerHTML='';
+  markets.forEach(function(mk){
+    var now=new Date(new Date().toLocaleString('en-US',{timeZone:mk.tz}));
+    var t=now.getHours()*60+now.getMinutes();
+    var wkd=now.getDay()===0||now.getDay()===6;
+    var isOpen=!wkd&&t>=mk.open&&t<mk.close;
+    var isPre=!wkd&&t>=mk.open-60&&t<mk.open;
+    var tFmt=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    var sc=isOpen?'var(--green)':isPre?'var(--orange)':'var(--dim)';
+    var st=isOpen?'● Open':isPre?'◐ Pre-market':'○ Closed';
+    el.innerHTML+='<div class="sess-card">'+
+      '<div class="sess-mkt">'+mk.name+'</div>'+
+      '<div class="sess-time-big" style="color:'+(isOpen?'var(--text)':'var(--muted)')+'">'+tFmt+'</div>'+
+      '<div class="sess-status" style="color:'+sc+'">'+st+'</div>'+
+      '<div class="sess-sub">'+mk.label+'</div>'+
+      '</div>';
+  });
+}
+setInterval(updateMarketClocks,30000);
+
+// ══════════════════════════════════════════
+// SCHEDULE
+// ══════════════════════════════════════════
+var schedule=[
+  {time:'6:00 PM',label:'Market Research',desc:'Check Gold, GBPJPY, GER40 levels. US futures, DXY. 15 min max.',badge:'Prep',bc:'blue'},
+  {time:'7:00 PM',label:'Content Creation',desc:"Post yesterday's best clip to X + TikTok. Write 1 hot take post.",badge:'Content',bc:'green'},
+  {time:'8:00 PM',label:'Rest & Dinner',desc:'Recharge. You stream better when fresh.',badge:'Rest',bc:'orange'},
+  {time:'8:30 PM',label:'Stream Setup',desc:'OBS, charts (Gold + GBPJPY + GER40 open), mic check, announce on X.',badge:'Setup',bc:'orange'},
+  {time:'9:00 PM',label:'Go Live — Warmup',desc:'Chat with early viewers. Review key levels on all 3 pairs.',badge:'Warmup',bc:'blue'},
+  {time:'9:30 PM',label:'PRIME TIME — NY Open',desc:'NYSE opens. Gold + GBPJPY volatile. GER40 reacts to US. Maximum energy.',badge:'LIVE',bc:'red'},
+  {time:'11:00 PM',label:'Wrap + P&L Reveal',desc:'Summarize all 3 pairs. Honest P&L. Tease tomorrow session.',badge:'Wrap',bc:'green'},
+  {time:'11:30 PM',label:'Post-Stream Review',desc:'Note top 2 moments. Schedule clip for tomorrow morning.',badge:'Review',bc:'orange'},
+];
+function renderTodaySched() {
+  var el=document.getElementById('today-sched');
+  if(!el) return;
+  var cm={blue:'var(--blue)',green:'var(--green)',red:'var(--red)',orange:'var(--orange)'};
+  var bm={blue:'rgba(96,165,250,0.1)',green:'rgba(62,207,142,0.1)',red:'rgba(248,113,113,0.1)',orange:'rgba(251,146,60,0.1)'};
+  schedule.forEach(function(s){
+    el.innerHTML+='<div class="sched-item">'+
+      '<div class="sched-time">'+s.time+'</div>'+
+      '<div class="sched-dot"><div class="sched-circle" style="background:'+cm[s.bc]+'"></div><div class="sched-line"></div></div>'+
+      '<div class="sched-content">'+
+      '<div class="sched-title">'+s.label+'<span class="sbadge" style="background:'+bm[s.bc]+';color:'+cm[s.bc]+'">'+s.badge+'</span></div>'+
+      '<div class="sched-desc">'+s.desc+'</div>'+
+      '</div></div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// CHECKLISTS
+// ══════════════════════════════════════════
+var dailyChecks=[
+  {id:'d1',title:'Check Gold, GBPJPY, GER40 levels',sub:'Mark key S/R on TradingView. 15 min.'},
+  {id:'d2',title:'Post 1 market take on X',sub:'Hot take, chart, or meme. Do it even on non-stream days.'},
+  {id:'d3',title:'Post 1 clip from last stream',sub:'Best reaction, trade call, or SL moment. 30–60 seconds.'},
+  {id:'d4',title:'Reply to 5 bigger trading accounts',sub:'Be SwagKong. Add value. Build visibility.'},
+  {id:'d5',title:'Pre-stream announcement on X',sub:'"SwagKong LIVE at 9 PM — watching Gold, GBPJPY, GER40 🦍"'},
+  {id:'d6',title:'Reflect after stream',sub:'What got the most reactions? Note it. Do more of it.'},
+];
+var streamChecks=[
+  {id:'s1',title:'OBS test record — 30s audio/video check',sub:'No lag, no echo, no blur'},
+  {id:'s2',title:'TradingView: Gold, GBPJPY, GER40 charts ready',sub:"Mark today's key levels on each pair"},
+  {id:'s3',title:'Post "Going Live in 30" on X',sub:'Include pairs you are watching + SwagKong image'},
+  {id:'s4',title:'Discord stream-alerts pinged',sub:'Ping everyone with stream link'},
+  {id:'s5',title:'Phone on silent / full DND',sub:'No notifications on stream'},
+  {id:'s6',title:'Water ready',sub:'Hydrate or lose voice. Seriously.'},
+  {id:'s7',title:'Stream title set',sub:'"🦍 SwagKong LIVE | Gold + GBPJPY + GER40 | 9 PM WIB"'},
+  {id:'s8',title:'OBS replay buffer ON',sub:'Instant clip saves = content gold'},
+];
+function buildChecklist(items,cid,key) {
+  var el=document.getElementById(cid);
+  if(!el) return;
+  el.innerHTML='';
+  var saved=JSON.parse(localStorage.getItem(key)||'{}');
+  items.forEach(function(c){
+    var done=saved[c.id]||false;
+    el.innerHTML+='<div class="check-item'+(done?' is-done':'')+'" id="ci-'+c.id+'-'+key+'" onclick="toggleCheck(\''+c.id+'\',\''+key+'\')">'+
+      '<div class="check-box'+(done?' done':'')+'" id="cb-'+c.id+'-'+key+'"></div>'+
+      '<div><div class="check-title">'+c.title+'</div><div class="check-sub">'+c.sub+'</div></div>'+
+      '</div>';
+  });
+}
+function toggleCheck(id,key) {
+  var s=JSON.parse(localStorage.getItem(key)||'{}');
+  s[id]=!s[id];
+  localStorage.setItem(key,JSON.stringify(s));
+  var cb=document.getElementById('cb-'+id+'-'+key), ci=document.getElementById('ci-'+id+'-'+key);
+  if(cb) cb.classList.toggle('done',s[id]);
+  if(ci) ci.classList.toggle('is-done',s[id]);
+}
+
+// ══════════════════════════════════════════
+// STREAM STRUCTURE
+// ══════════════════════════════════════════
+var structure=[
+  {time:'0–5m',label:'SwagKong Entrance',desc:'"THE GORILLA IS IN THE MARKET." Intro music, kong image, full energy from second 1.',bc:'red'},
+  {time:'5–15m',label:'Market Context — All 3 Pairs',desc:'Gold situation. GBPJPY bias. GER40 direction. Quick and clear — not a lecture.',bc:'blue'},
+  {time:'15–30m',label:'Setup Hunting',desc:'Walk through charts live. Talk your logic. Wrong analysis OUT LOUD beats silent fake confidence.',bc:'blue'},
+  {time:'30–60m',label:'LIVE TRADING — NY Open',desc:'React to 9:30 PM open. Trade or watch setups live. Full unfiltered commentary.',bc:'red'},
+  {time:'60–75m',label:'Viewer Q&A + Poll',desc:'"What should Kong trade next?" Chat drives the action. Keep energy up.',bc:'green'},
+  {time:'75–90m',label:'P&L Reveal + Wrap',desc:'Honest total. Win or lose — be real. "Follow for tomorrow. The Kong is not done."',bc:'orange'},
+];
+function buildStructure() {
+  var el=document.getElementById('stream-structure');
+  if(!el) return;
+  var cm={red:'var(--red)',blue:'var(--blue)',green:'var(--green)',orange:'var(--orange)'};
+  structure.forEach(function(s){
+    el.innerHTML+='<div class="sched-item">'+
+      '<div class="sched-time" style="min-width:52px">'+s.time+'</div>'+
+      '<div class="sched-dot"><div class="sched-circle" style="background:'+cm[s.bc]+'"></div><div class="sched-line"></div></div>'+
+      '<div class="sched-content"><div class="sched-title">'+s.label+'</div><div class="sched-desc">'+s.desc+'</div></div>'+
+      '</div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// ECON EVENTS
+// ══════════════════════════════════════════
+var econEvents=[
+  {day:'1st Fri/month',name:'US NFP (Non-Farm Payrolls)',time:'8:30 PM WIB',pairs:['GOLD','GBPJPY'],note:'Most important monthly event. Plan a dedicated stream. Gold moves $20–50, GBPJPY moves 100+ pips.'},
+  {day:'Monthly',name:'US CPI (Inflation Data)',time:'8:30 PM WIB',pairs:['GOLD','GBPJPY','GER40'],note:'Massive move trigger for all 3 pairs. Be live by 8:00 PM. React on X before stream starts.'},
+  {day:'Every 6 weeks',name:'FOMC Rate Decision',time:'1:00 AM WIB',pairs:['GOLD','GBPJPY'],note:'Late night but huge. Stream it or post reaction clips the next day.'},
+  {day:'Monthly',name:'UK CPI & BOE Rate Decision',time:'2:00 PM WIB',pairs:['GBPJPY'],note:'Direct GBP impact. Great daytime content even on non-stream days.'},
+  {day:'Monthly',name:'German ZEW / IFO Data',time:'3:00 PM WIB',pairs:['GER40'],note:'Watch GER40 reaction. Good for pre-stream context content on X.'},
+  {day:'Quarterly',name:'Big Tech Earnings (AAPL, TSLA, NVDA)',time:'After NY close',pairs:['GER40'],note:'Plan special streams during earnings season — Jan, Apr, Jul, Oct.'},
+];
+function buildEconEvents() {
+  var el=document.getElementById('econ-events');
+  if(!el) return;
+  var pc={GOLD:'tg',GBPJPY:'tb',GER40:'to'};
+  econEvents.forEach(function(e){
+    el.innerHTML+='<div class="econ-ev">'+
+      '<div class="econ-hd"><div class="econ-name">'+e.name+'</div><div class="econ-time">'+e.time+'</div></div>'+
+      '<div class="econ-note">'+e.note+'</div>'+
+      '<div class="econ-meta"><span style="font-size:10px;color:var(--dim)">'+e.day+' ·</span>'+
+      e.pairs.map(function(p){return '<span class="tag '+(pc[p]||'tg')+'">'+p+'</span>';}).join('')+
+      '</div></div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// H4 DEEP ANALYSIS — researched April 6, 2026
+// ══════════════════════════════════════════
+var ANALYSIS=[
+  {
+    pair:'GBPJPY', color:'var(--blue)', bias:'BEAR', tf:'H4',
+    price:'210.90',
+    context:'GBPJPY is in a bearish phase on H4 as of April 2026. Price was rejected from the 212.00 pivot resistance (aligns with 61.8% Fib retracement). Daily candle closed weak bearish Thursday. Structure: lower highs forming. BOJ intervention risk elevated above 212.',
+    res:[{v:'212.00',note:'Key H4 pivot — 61.8% Fib, major rejection zone'},{v:'212.33',note:'Previous 4H support turned resistance'},{v:'213.57',note:'Strong pullback resistance above'},{v:'214.11',note:'Upper target if bias flips bull'}],
+    sup:[{v:'211.75',note:'Nearest 4H support / daily pivot'},{v:'210.53',note:'38.2% Fib retracement — watch for bounce'},{v:'210.18',note:'Overlap support, 78.6% Fib — strong zone'},{v:'209.77',note:'Daily support — final bull defense'}],
+    entry:{
+      bull:'Wait for price to drop to 210.18–210.53 support zone on H4. On 15M, wait for a bullish engulfing or hammer candle at that zone. Enter long. TP1: 211.75. TP2: 212.00. SL: below 209.70.',
+      bear:'Price rejects 212.00 resistance on H4. On 15M, watch for a bearish engulfing or shooting star at 212.00. Enter short. TP1: 210.53. TP2: 210.18. SL: above 212.40.',
+      bias:'BEAR — short rallies toward 212.00. Only flip bull if 4H closes above 212.40.'
+    },
+    tips:['Do NOT enter during Tokyo session (5AM–2PM WIB) — GBPJPY is dead slow','Best 15M setups appear at London open (2PM WIB) and NY open (9:30PM WIB)','BOJ intervention historically triggers at 152.00 USDJPY — watch that pair as leading indicator for JPY strength']
+  },
+  {
+    pair:'XAU/USD (Gold)', color:'var(--gold2)', bias:'BULL', tf:'H4',
+    price:'4,650',
+    context:'Gold is at all-time highs in April 2026, trading near $4,650 after peaking at $4,805. H4 shows correction from 4,805 resistance with support forming at 4,576–4,645 zone. Geopolitical risk (Middle East/Iran) keeping gold elevated. DXY weakness = gold strength. Structure remains bullish above 4,510.',
+    res:[{v:'4,700',note:'Immediate H4 resistance — sellers defended here'},{v:'4,736',note:'Next key level if 4,700 breaks'},{v:'4,800–4,805',note:'Major H4 resistance — previous high rejection'},{v:'4,910',note:'Breakout target — closes above = new leg up'}],
+    sup:[{v:'4,645',note:'Nearest H4 support — monthly open zone'},{v:'4,576',note:'Strong H4 support — hammer candle formed here'},{v:'4,509',note:'Key structural H4 support — bull/bear line'},{v:'4,420–4,441',note:'Major demand zone — strong bull defense expected'}],
+    entry:{
+      bull:'H4 pulls back to 4,576–4,645 support zone. On 15M, wait for bullish engulfing or pin bar bouncing off that zone. Enter long. TP1: 4,700. TP2: 4,736. SL: below 4,509.',
+      bear:'Price rejects 4,700–4,736 resistance on H4. On 15M, look for bearish engulfing at resistance. Enter short. TP1: 4,645. TP2: 4,576. SL: above 4,760.',
+      bias:'BULL — buy dips to 4,576–4,645 zone. Only flip bear if H4 closes below 4,509.'
+    },
+    tips:['Gold moves most at 9:30PM WIB (NY open) and during US data events (CPI, NFP, FOMC)','Watch DXY — if DXY drops, buy gold. If DXY pumps, wait for gold to stabilize before buying','Round numbers ($4,500 / $4,600 / $4,700) are psychological S/R — price always reacts at these levels']
+  },
+  {
+    pair:'GER40 (DAX)', color:'var(--orange)', bias:'BEAR', tf:'H4',
+    price:'22,300',
+    context:'GER40 is in correction mode after ATH at 25,507 in January 2026. Currently ranging 22,000–23,300. H4 shows bearish structure with 23,113 acting as key resistance (previous consolidation area). Middle East tensions + Iran situation creating volatility. Oversold bounce possible but trend is down on higher timeframes.',
+    res:[{v:'23,113',note:'Key H4 resistance — consolidation zone, sells defended here'},{v:'23,293',note:'H4 pullback resistance — 61.8% Fib retracement'},{v:'23,976',note:'Strong resistance — SL zone for shorts'}],
+    sup:[{v:'22,300',note:'Current price — immediate support area'},{v:'22,000',note:'Psychological round number — strong support'},{v:'21,895',note:'H4 support target if bearish continues'},{v:'21,000',note:'Major demand zone — monthly support'}],
+    entry:{
+      bull:'Price drops to 22,000 support on H4. On 15M, look for bullish engulfing or double bottom at 22,000. Enter long. TP1: 22,814. TP2: 23,113. SL: below 21,800.',
+      bear:'Price rallies to 23,113 resistance on H4. On 15M, watch for bearish rejection candle at that zone. Enter short. TP1: 22,300. TP2: 22,000. SL: above 23,300.',
+      bias:'BEAR — short rallies toward 23,113. Treat bounces as selling opportunities until price reclaims 23,300 on H4 close.'
+    },
+    tips:['GER40 cash session: 2PM–10:30PM WIB. Do NOT trade outside these hours','Biggest move happens at 9:30PM WIB when US market opens — GER40 always reacts','German ZEW/IFO data at 3PM WIB moves GER40 100–200 points instantly — check calendar before trading']
+  }
+];
+
+function buildSRChart(pair) {
+  var cfg={
+    'GBPJPY':{
+      min:209.50,max:214.50,cur:210.90,
+      sup:[{v:209.77,s:'D-Sup'},{v:210.18,s:'S3'},{v:210.53,s:'S2'},{v:211.75,s:'S1'}],
+      res:[{v:212.00,s:'R1★'},{v:212.33,s:'R2'},{v:213.57,s:'R3'},{v:214.11,s:'R4'}],
+      clr:'#60a5fa'
+    },
+    'XAU/USD (Gold)':{
+      min:4380,max:4850,cur:4650,
+      sup:[{v:4441,s:'S4'},{v:4509,s:'S3'},{v:4576,s:'S2'},{v:4645,s:'S1★'}],
+      res:[{v:4700,s:'R1★'},{v:4736,s:'R2'},{v:4805,s:'R3'},{v:4910,s:'R4'}],
+      clr:'#f0c96b'
+    },
+    'GER40 (DAX)':{
+      min:21600,max:24100,cur:22300,
+      sup:[{v:21895,s:'S3'},{v:22000,s:'S2★'},{v:22300,s:'S1'}],
+      res:[{v:23113,s:'R1★'},{v:23293,s:'R2'},{v:23976,s:'R3'}],
+      clr:'#fb923c'
+    }
+  };
+  var c=cfg[pair];
+  if(!c) return '';
+  var W=560,H=200,PAD=60;
+  var range=c.max-c.min;
+  function y(v){return PAD+(1-(v-c.min)/range)*(H-PAD*2);}
+
+  var svgLines='';
+  // support zones
+  c.sup.forEach(function(s){
+    var yv=y(s.v).toFixed(1);
+    svgLines+='<line x1="40" y1="'+yv+'" x2="'+(W-10)+'" y2="'+yv+'" stroke="#3ecf8e" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>';
+    svgLines+='<rect x="40" y="'+(parseFloat(yv)-8)+'" width="'+(W-50)+'" height="8" fill="#3ecf8e" opacity="0.07"/>';
+    svgLines+='<text x="36" y="'+yv+'" fill="#3ecf8e" font-size="9" text-anchor="end" dominant-baseline="middle" font-family="JetBrains Mono,monospace">'+s.s+'</text>';
+    svgLines+='<text x="'+(W-8)+'" y="'+yv+'" fill="#3ecf8e" font-size="9" text-anchor="end" dominant-baseline="middle" font-family="JetBrains Mono,monospace">'+s.v+'</text>';
+  });
+  // resistance zones
+  c.res.forEach(function(r){
+    var yv=y(r.v).toFixed(1);
+    svgLines+='<line x1="40" y1="'+yv+'" x2="'+(W-10)+'" y2="'+yv+'" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>';
+    svgLines+='<rect x="40" y="'+yv+'" width="'+(W-50)+'" height="8" fill="#f87171" opacity="0.07"/>';
+    svgLines+='<text x="36" y="'+yv+'" fill="#f87171" font-size="9" text-anchor="end" dominant-baseline="middle" font-family="JetBrains Mono,monospace">'+r.s+'</text>';
+    svgLines+='<text x="'+(W-8)+'" y="'+yv+'" fill="#f87171" font-size="9" text-anchor="end" dominant-baseline="middle" font-family="JetBrains Mono,monospace">'+r.v+'</text>';
+  });
+  // current price
+  var cp=y(c.cur).toFixed(1);
+  svgLines+='<line x1="40" y1="'+cp+'" x2="'+(W-10)+'" y2="'+cp+'" stroke="'+c.clr+'" stroke-width="2"/>';
+  svgLines+='<circle cx="'+(W/2)+'" cy="'+cp+'" r="5" fill="'+c.clr+'"/>';
+  svgLines+='<rect x="'+(W/2-30)+'" y="'+(parseFloat(cp)-20)+'" width="60" height="16" rx="3" fill="'+c.clr+'" opacity="0.2"/>';
+  svgLines+='<text x="'+(W/2)+'" y="'+(parseFloat(cp)-8)+'" fill="'+c.clr+'" font-size="10" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="bold">'+c.cur+'</text>';
+
+  return '<svg width="100%" viewBox="0 0 '+W+' '+H+'" style="background:#13131a;border-radius:8px;margin:12px 0 8px;">'
+    +'<text x="'+(W/2)+'" y="14" fill="#555" font-size="10" text-anchor="middle" font-family="JetBrains Mono,monospace">H4 STRUCTURE — S/R MAP (researched Apr 6, 2026)</text>'
+    +svgLines
+    +'<text x="42" y="'+H+'" fill="#3ecf8e" font-size="9" font-family="JetBrains Mono,monospace">■ Support</text>'
+    +'<text x="110" y="'+H+'" fill="#f87171" font-size="9" font-family="JetBrains Mono,monospace">■ Resistance</text>'
+    +'<text x="178" y="'+H+'" fill="'+c.clr+'" font-size="9" font-family="JetBrains Mono,monospace">● Current Price</text>'
+    +'<text x="280" y="'+H+'" fill="#555" font-size="9" font-family="JetBrains Mono,monospace">★ = Key level to watch</text>'
+    +'</svg>';
+}
+
+function renderAnalysis(animate) {
+  var el=document.getElementById('analysis-out');
+  if(!el) return;
+  if(animate){el.innerHTML='<div class="gen"><div class="spin"></div>Researching H4 levels...</div>';}
+  setTimeout(function(){
+    el.innerHTML=ANALYSIS.map(function(a){
+      var resHTML=a.res.map(function(r){
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(248,113,113,0.1);">'
+          +'<span style="font-family:var(--mono);font-size:11px;color:var(--red);">R '+r.v+'</span>'
+          +'<span style="font-size:11px;color:var(--muted);">'+r.note+'</span>'
+          +'</div>';
+      }).join('');
+      var supHTML=a.sup.map(function(s){
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(62,207,142,0.1);">'
+          +'<span style="font-family:var(--mono);font-size:11px;color:var(--green);">S '+s.v+'</span>'
+          +'<span style="font-size:11px;color:var(--muted);">'+s.note+'</span>'
+          +'</div>';
+      }).join('');
+
+      return '<div class="a-pair fu" style="margin-bottom:20px;">'
+        // Header
+        +'<div class="a-hdr" style="margin-bottom:4px;">'
+        +'<span class="a-pname" style="color:'+a.color+';">'+a.pair+'</span>'
+        +'<span class="bias-pill '+(a.bias==='BULL'?'b-bull':'b-bear')+'">'+a.bias+'</span>'
+        +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:8px;">'+a.tf+' · Price: '+a.price+'</span>'
+        +'</div>'
+        // Context
+        +'<div class="a-body" style="margin-bottom:10px;">'+a.context+'</div>'
+        // SVG Chart
+        +buildSRChart(a.pair)
+        // SR Table
+        +'<div class="g2" style="gap:10px;margin-bottom:12px;">'
+        +'<div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-radius:8px;padding:10px;">'
+        +'<div style="font-size:10px;color:var(--red);font-weight:600;letter-spacing:1px;margin-bottom:6px;font-family:var(--mono);">RESISTANCE ZONES</div>'
+        +resHTML+'</div>'
+        +'<div style="background:rgba(62,207,142,0.05);border:1px solid rgba(62,207,142,0.15);border-radius:8px;padding:10px;">'
+        +'<div style="font-size:10px;color:var(--green);font-weight:600;letter-spacing:1px;margin-bottom:6px;font-family:var(--mono);">SUPPORT ZONES</div>'
+        +supHTML+'</div>'
+        +'</div>'
+        // 15M Entry Box
+        +'<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px;margin-bottom:10px;">'
+        +'<div style="font-size:10px;color:var(--gold);font-weight:600;letter-spacing:1px;margin-bottom:8px;font-family:var(--mono);">15M ENTRY RECOMMENDATION</div>'
+        +'<div style="margin-bottom:8px;">'
+        +'<span style="font-size:10px;background:rgba(62,207,142,0.15);color:var(--green);padding:2px 8px;border-radius:4px;font-family:var(--mono);margin-right:6px;">LONG SETUP</span>'
+        +'<span style="font-size:12px;color:var(--muted);line-height:1.6;">'+a.entry.bull+'</span></div>'
+        +'<div style="margin-bottom:8px;">'
+        +'<span style="font-size:10px;background:rgba(248,113,113,0.12);color:var(--red);padding:2px 8px;border-radius:4px;font-family:var(--mono);margin-right:6px;">SHORT SETUP</span>'
+        +'<span style="font-size:12px;color:var(--muted);line-height:1.6;">'+a.entry.bear+'</span></div>'
+        +'<div style="font-size:11px;color:var(--gold2);font-weight:500;">Bias: '+a.entry.bias+'</div>'
+        +'</div>'
+        // Tips
+        +'<div style="display:flex;flex-direction:column;gap:5px;">'
+        +a.tips.map(function(t){
+          return '<div style="font-size:12px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--gold);flex-shrink:0;">🦍</span>'+t+'</div>';
+        }).join('')
+        +'</div>'
+        +'</div>';
+    }).join('');
+  },animate?900:0);
+}
+
+// ══════════════════════════════════════════
+// CONTENT GENERATOR
+// ══════════════════════════════════════════
+var _cs={};
+function genContent() {
+  var el=document.getElementById('content-gen-out');
+  if(!el) return;
+  el.innerHTML='<div class="gen"><div class="spin"></div>JARVIS creating content pack...</div>';
+  var w=getWIB();
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var day=days[w.getDay()];
+  var dateStr=w.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  setTimeout(function(){
+    var templates=[
+      {plat:'TWITTER / X — Daily Bias',
+       text:'GBPJPY · XAU/USD · GER40 bias '+day+' ('+dateStr+'):\n\nGBPJPY: Bullish above 191.00\nGold: Watching 2325 support\nGER40: Following US futures\n\nPrime stream: 9:30 PM WIB\nNY open = all 3 pairs moving. 🦍\n\n#GBPJPY #XAUUSD #GER40 #SwagKong #ForexTrader',
+       tags:['#GBPJPY','#XAUUSD','#GER40','#SwagKong']},
+      {plat:'YOUTUBE SHORTS — 60s Script',
+       text:'[HOOK — 0 to 3s]\n"3 pairs. 1 gorilla. Let\'s see what the market is doing tonight." 🦍\n\n[CONTENT — 3 to 50s]\nGBPJPY watching 192.00 — that is where sellers showed up last session. Break above, I am looking for 192.50.\n\nGold holding 2325 — bullish above that, flat below it.\n\nGER40 following US futures. NY open at 9:30 PM WIB will decide direction.\n\nSo the plan is simple: wait for NY open, let the pairs show their hand, then execute.\n\n[CTA — 50 to 60s]\nCatch me live at 9 PM WIB. Link in bio for premium signals. SwagKong — make it simple. 🦍',
+       tags:['60s script','3 pairs','Price action']},
+      {plat:'INSTAGRAM / TIKTOK — Caption',
+       text:'3 pairs. 1 session. 1 gorilla watching it all. 🦍\n\nGBPJPY, Gold, and GER40 all moving at 9:30 PM WIB when NY opens.\n\nThat is why I go live at 9 PM every night — so you can watch me trade it live.\n\nNo theory. No backtesting drama. Real funded account, real decisions.\n\nSee you tonight.\n\n#SwagKong #GBPJPY #XAUUSD #GER40 #PropFirm #ForexIndonesia #TradingLife',
+       tags:['#SwagKong','#ForexIndonesia','#LiveTrading']},
+      {plat:'YOUTUBE LIVE — Title and Description',
+       text:'TITLE:\n🦍 SwagKong LIVE | GBPJPY + Gold + GER40 | NY Open 9:30 PM WIB\n\nDESCRIPTION:\nLive trading GBPJPY, XAU/USD, and GER40 with real funded account capital. Watching all 3 pairs react to the NYSE open at 9:30 PM WIB. 15M price action only — no indicators, no noise.\n\n🔗 Premium Signals: [your Telegram link]\n🔗 SuperFunded: https://superfunded.com/?aff=50\n🔗 PipFarm: https://pipfarm.com/?ref=swagkong\n🔗 HyroTrader: https://www.hyrotrader.com/?coupon=swagkong\n\n#GBPJPY #XAUUSD #GER40 #SwagKong #LiveTrading #PropFirm',
+       tags:['Stream title','Description','SEO ready']},
+      {plat:'TELEGRAM / SIGNALS — Pre-Stream Update',
+       text:'🦍 SwagKong Elite — Pre-Stream Brief\n\nGBPJPY: BULLISH above 191.00\n📍 Watch 192.00 resistance\n\nXAU/USD: BULLISH above 2325\n📍 Watch 2350 for next leg\n\nGER40: BULLISH following US futures\n📍 Watch 18,800 resistance\n\n⏰ Going live at 9:00 PM WIB — NY open at 9:30 PM\nAll 3 pairs expected to move.\n\nMake it simple. Execute. 🦍',
+       tags:['Signal format','Telegram','Pre-stream']},
+    ];
+    _cs={};
+    el.innerHTML=templates.map(function(t,i){
+      _cs[i]=t.text;
+      var safe=t.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return '<div class="ct fu">'+
+        '<div class="ct-plat">'+t.plat+'</div>'+
+        '<div class="ct-pre">'+safe+'</div>'+
+        '<div class="ct-tags">'+t.tags.map(function(tg){return '<span class="ct-tag">'+tg+'</span>';}).join('')+'</div>'+
+        '<span class="ct-copy" onclick="doCopy(this,'+i+')">Copy</span>'+
+        '</div>';
+    }).join('');
+  },1200);
+}
+
+function doCopy(el,idx) {
+  var text=_cs[idx]||'';
+  function fb(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  try{navigator.clipboard.writeText(text).catch(fb);}catch(e){fb();}
+  el.textContent='✓ Copied!';
+  setTimeout(function(){el.textContent='Copy';},2200);
+}
+
+// ══════════════════════════════════════════
+// WEEKLY CALENDAR
+// ══════════════════════════════════════════
+var week=[
+  {day:'Mon',stream:true,tasks:['Weekend recap: GBPJPY, Gold, GER40 key levels','Stream: Week ahead bias on all 3 pairs','Clip: "What Kong is watching this week"']},
+  {day:'Tue',stream:true,tasks:['Post 1 educational chart from your pairs','Stream: Live NY session — react and trade','Clip: best trade or reaction moment']},
+  {day:'Wed',stream:false,tasks:['REST from streaming','Batch edit 2–3 clips for Thu/Fri','Post meme or funny GBPJPY/Gold/GER40 content','Engage: reply to 5 bigger accounts']},
+  {day:'Thu',stream:true,tasks:['Hot take post: current market bias on your pairs','Stream: Focus on most volatile pair tonight','Clip: setup walkthrough or SL reaction']},
+  {day:'Fri',stream:true,tasks:['NFP day? Go live at 8:30 PM early (data at 8:30 PM)','Stream: End of week recap all 3 pairs','Post weekly P&L — honest SwagKong style']},
+  {day:'Sat',stream:false,tasks:["Schedule next week's content","Plan which events to build streams around",'Post casual SwagKong vibe content']},
+  {day:'Sun',stream:false,tasks:['Weekly review: what got most reactions?','Read weekend market news for GBPJPY and Gold','REST — protect your energy']},
+];
+function buildWeekly() {
+  var el=document.getElementById('weekly-cal');
+  if(!el) return;
+  week.forEach(function(d){
+    el.innerHTML+='<div class="week-row">'+
+      '<div class="week-day" style="color:'+(d.stream?'var(--gold)':'var(--muted)')+'">'+d.day+(d.stream?'<br><span style="font-size:10px;color:var(--red)">🔴 Stream</span>':'<br><span style="font-size:10px;color:var(--dim)">off</span>')+'</div>'+
+      '<div class="week-tasks">'+d.tasks.map(function(t){return '<div class="week-task">'+t+'</div>';}).join('')+'</div>'+
+      '</div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// CONTENT IDEAS
+// ══════════════════════════════════════════
+var ideas=[
+  {title:'"SwagKong SL Club" — all 3 pairs edition',desc:'Every time any of your pairs stops you out, react on camera. GBPJPY SL reactions will go viral — that pair moves fast and the reactions are gold.',tags:['Viral','Series','GBPJPY']},
+  {title:'"Gorilla vs the DAX" episodes',desc:'Frame each GER40 stream as SwagKong vs Frankfurt. Kong vs Germany. Win or lose — it is a story. GER40 + gorilla brand is an untapped niche.',tags:['GER40','Brand','Series']},
+  {title:'"GBPJPY is WILD tonight" live reaction clips',desc:'GBPJPY is the most volatile major. 80–150 pip moves during NY open = extreme reactions = extreme clips. Post every single one.',tags:['GBPJPY','Clips','Viral']},
+  {title:'Live NFP Gold reaction stream',desc:'Special stream every NFP Friday. "Will Gold pump or dump at 8:30 PM?" React live. This is the most clipworthy and viewable day of the month.',tags:['Event','GOLD','High views']},
+  {title:'"3 pairs, 1 gorilla" weekly recap thread on X',desc:'Every Sunday: pick your best moment from each of your 3 pairs. One X thread, 4 posts. SwagKong commentary style — not dry analysis.',tags:['X Growth','Weekly','Brand']},
+  {title:'Merch: "GBPJPY broke me" hoodie',desc:'Trading inside jokes sell. "GER40 said no", "Gold took my lunch", "GBPJPY SL Club member" — these are product names, not just memes.',tags:['Merch','Income','GBPJPY']},
+];
+function buildIdeas() {
+  var el=document.getElementById('content-ideas');
+  if(!el) return;
+  var tc={Viral:'tr',Series:'tg',GBPJPY:'tb',GER40:'to',GOLD:'tg',Brand:'tg',Event:'tr','High views':'tgr','X Growth':'tb',Weekly:'tg',Brand:'tg',Merch:'tg',Income:'tgr',Clips:'tb'};
+  ideas.forEach(function(idea,i){
+    el.innerHTML+='<div class="idea-item">'+
+      '<div class="idea-num">'+(i+1)+'</div>'+
+      '<div style="flex:1"><div class="idea-title">'+idea.title+'</div><div class="idea-desc">'+idea.desc+'</div>'+
+      '<div style="margin-top:6px">'+idea.tags.map(function(t){return '<span class="tag '+(tc[t]||'tg')+'">'+t+'</span>';}).join('')+'</div>'+
+      '</div></div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════
+var goals=[
+  {label:'Month 1–2: Stream consistency',target:'3–4x/week for 8 weeks',pct:5,color:'var(--blue)'},
+  {label:'Month 2–3: X engagement',target:'250+ avg impressions/post',pct:0,color:'var(--blue)'},
+  {label:'Month 3: Merch live',target:'SwagKong tee + SL Club mug',pct:0,color:'var(--gold)'},
+  {label:'Month 4: Paid community',target:'20 Discord members at $15/mo',pct:0,color:'var(--orange)'},
+  {label:'Month 5: Digital product',target:'Trading guide at $27–49',pct:0,color:'var(--green)'},
+  {label:'Month 6: $1k+/month',target:'All income streams combined',pct:0,color:'var(--red)'},
+];
+function buildGoals() {
+  var el=document.getElementById('goals-list');
+  if(!el) return;
+  goals.forEach(function(g){
+    el.innerHTML+='<div class="goal-item">'+
+      '<div class="goal-hd"><span class="goal-name">'+g.label+'</span><span class="goal-target">'+g.target+'</span></div>'+
+      '<div class="bar-bg"><div class="bar-fill" style="width:'+g.pct+'%;background:'+g.color+'"></div></div>'+
+      '</div>';
+  });
+}
+
+// ══════════════════════════════════════════
+// HABIT TRACKER
+// ══════════════════════════════════════════
+var habits=[
+  {id:'h1',label:'Streams this week',max:4},
+  {id:'h2',label:'X posts',max:7},
+  {id:'h3',label:'Clips posted',max:4},
+  {id:'h4',label:'Accounts engaged',max:20},
+];
+function buildHabits() {
+  var el=document.getElementById('habit-tracker');
+  if(!el) return;
+  el.innerHTML='';
+  habits.forEach(function(h){
+    var v=parseInt(localStorage.getItem('sk-hab-'+h.id)||'0');
+    var dots=Array.from({length:h.max},function(_,i){return '<div class="habit-dot'+(i<v?' filled':'')+'" onclick="toggleHabit(\''+h.id+'\','+h.max+','+i+')"></div>';}).join('');
+    el.innerHTML+='<div class="habit-item">'+
+      '<div class="habit-lbl">'+h.label+'</div>'+
+      '<div class="habit-dots" id="hd-'+h.id+'">'+dots+'</div>'+
+      '<div class="habit-val" id="hv-'+h.id+'">'+v+'/'+h.max+'</div>'+
+      '</div>';
+  });
+}
+function toggleHabit(id,max,idx) {
+  var v=parseInt(localStorage.getItem('sk-hab-'+id)||'0');
+  v=(idx<v)?idx:idx+1;
+  v=Math.max(0,Math.min(max,v));
+  localStorage.setItem('sk-hab-'+id,v);
+  var dots=document.getElementById('hd-'+id);
+  if(dots) dots.querySelectorAll('.habit-dot').forEach(function(d,i){d.classList.toggle('filled',i<v);});
+  var val=document.getElementById('hv-'+id);
+  if(val) val.textContent=v+'/'+max;
+}
+function resetHabits(){habits.forEach(function(h){localStorage.removeItem('sk-hab-'+h.id);});buildHabits();}
+
+// ══════════════════════════════════════════
+// MORNING BRIEF
+// ══════════════════════════════════════════
+function genBrief() {
+  var el=document.getElementById('brief-out');
+  if(!getKey()){el.innerHTML='<span style="color:var(--muted);font-size:13px;">Set your API key in ⚙ Setup to get AI-powered briefs.</span>';return;}
+  el.innerHTML='<div class="gen"><div class="spin"></div>JARVIS analyzing your 3 pairs...</div>';
+  var w=getWIB();
+  callClaude([{role:'user',content:'Generate a concise SwagKong morning brief for '+w.toDateString()+' at '+pad(w.getHours())+':'+pad(w.getMinutes())+' WIB (Jakarta). Cover his 3 pairs: GBPJPY, XAU/USD (Gold), and GER40. Include: bias for each pair, one key risk/event today, best stream window in WIB time tonight, and one content action. Max 8 lines. Sharp and direct. Use 🦍 once.'}])
+    .then(function(txt){el.innerHTML=txt.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');})
+    .catch(function(e){el.innerHTML='<span style="color:var(--red);font-size:13px;">Error: '+e.message+'. Check API key in ⚙ Setup.</span>';});
+}
+
+// ══════════════════════════════════════════
+// CLAUDE API
+// ══════════════════════════════════════════
+var SYS='You are JARVIS, the AI trading assistant for SwagKong — a prop firm trader and content creator from Jakarta, Indonesia (WIB, UTC+7). SwagKong trades 3 pairs: GBPJPY (British Pound / Japanese Yen), XAU/USD (Gold), and GER40 (Germany 40 / DAX index). He uses 15-minute price action. His prime stream time is 9:00–11:00 PM WIB when NYSE opens and all 3 pairs move. Brand: cool gorilla character, all-black outfit, NY cap and shades. Tagline: "Make It Simple. Execute." He streams on YouTube and monetizes via prop firm affiliates (SuperFunded, PipFarm, HyroTrader), YouTube memberships, Telegram signals, and mentorship. Be direct, sharp, practical. Bold key terms with **text**. Keep replies concise but useful. Use 🦍 once max per reply. For content requests produce ready-to-copy text immediately.';
+
+function callClaude(messages) {
+  var key=getKey();
+  if(!key) return Promise.reject(new Error('No API key'));
+  return fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:messages})
+  }).then(function(res){
+    if(!res.ok) return res.json().then(function(d){throw new Error(d.error&&d.error.message?d.error.message:'HTTP '+res.status);});
+    return res.json();
+  }).then(function(d){return (d.content||[]).map(function(b){return b.text||'';}).join('');});
+}
+
+// ══════════════════════════════════════════
+// JARVIS CHAT
+// ══════════════════════════════════════════
+var HIST=[];
+
+function addMsg(role,html) {
+  var box=document.getElementById('jmsgs');
+  var d=document.createElement('div');
+  d.className='msg fu'+(role==='u'?' me':'');
+  if(role==='j'){
+    d.innerHTML='<div class="mav j">🦍</div><div><div class="bot-name">JARVIS</div><div class="mbub">'+html+'</div></div>';
+  } else {
+    d.innerHTML='<div class="mav u">👤</div><div class="mbub">'+html+'</div>';
+  }
+  box.appendChild(d);
+  box.scrollTop=box.scrollHeight;
+}
+
+function showTyping(){
+  var box=document.getElementById('jmsgs');
+  var d=document.createElement('div');
+  d.className='msg'; d.id='ty';
+  d.innerHTML='<div class="mav j">🦍</div><div class="mbub"><div class="typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+function removeTyping(){var t=document.getElementById('ty');if(t)t.remove();}
+
+function sendMsg() {
+  var inp=document.getElementById('jinput');
+  var text=inp.value.trim();
+  if(!text) return;
+  inp.value='';
+  if(!getKey()){
+    addMsg('u',text);
+    addMsg('j','API key not set. Go to <b>⚙ Setup</b> tab and paste your Anthropic key — takes 30 seconds. 🦍');
+    return;
+  }
+  addMsg('u',text);
+  HIST.push({role:'user',content:text});
+  showTyping();
+  callClaude(HIST.slice(-16))
+    .then(function(reply){
+      removeTyping();
+      HIST.push({role:'assistant',content:reply});
+      if(HIST.length>20) HIST.splice(0,2);
+      addMsg('j',reply.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'));
+    })
+    .catch(function(e){
+      removeTyping();
+      var msg=e.message.includes('401')?'Invalid API key — check ⚙ Setup tab.':
+               e.message.includes('429')?'Rate limit — wait a moment and try again.':
+               'Error: '+e.message;
+      addMsg('j',msg);
+    });
+}
+function qask(text){document.getElementById('jinput').value=text;sendMsg();}
+
+// ══════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════
+function goTab(id) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.nbtn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('tab-'+id).classList.add('on');
+  // match button by onclick text
+  document.querySelectorAll('.nbtn').forEach(function(b){
+    if(b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('on');
+  });
+}
+</script>
+</body>
+</html>
